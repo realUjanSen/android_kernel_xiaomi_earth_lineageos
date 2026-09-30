@@ -226,7 +226,7 @@ setup_variant() {
       git -C "${KERNEL_DIR}/${src}" clean -fd 2>/dev/null || true
       git -C "${KERNEL_DIR}/${src}" checkout -q "${target_ref}"
       
-      if [[ "$variant" == "ksu-next+susfs" || "$variant" == "sukisu-ultra+susfs" ]]; then
+      if [[ "$variant" == "ksu-next+susfs" ]]; then
         log "Injecting SUSFS v1.5.5 support into ${src} ${target_ref} branch..."
         
         # 1. Add #include <linux/susfs.h> and call susfs_try_umount(new_uid) in setuid_hook.c
