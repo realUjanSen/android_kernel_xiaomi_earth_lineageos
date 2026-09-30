@@ -225,6 +225,23 @@ setup_variant() {
       git -C "${KERNEL_DIR}/${src}" reset --hard HEAD 2>/dev/null || true
       git -C "${KERNEL_DIR}/${src}" clean -fd 2>/dev/null || true
       git -C "${KERNEL_DIR}/${src}" checkout -q "${target_ref}"
+
+        if [[ "$variant" == "sukisu-ultra+susfs" ]]; then
+            local dispatch_file="${KERNEL_DIR}/${src}/kernel/supercall/dispatch.c"
+            if [[ -f "$dispatch_file" ]]; then
+                log "Fixing SUSFS pointer typecasts in dispatch.c..."
+                python3 -c '
+import re, sys
+path = sys.argv[1]
+with open(path, "r") as f:
+    c = f.read()
+c = re.sub(r"(susfs_[a_z0-9_]+)\(\s*arg\s*\)", r"\1((void __user *)arg)", c)
+with open(path, "w") as f:
+    f.write(c)
+' "$dispatch_file"
+            fi
+        fi
+
       
       if [[ "$variant" == "ksu-next+susfs" ]]; then
         log "Injecting SUSFS v1.5.5 support into ${src} ${target_ref} branch..."
